@@ -29,14 +29,14 @@ export default async (req, res) => {
       // let lastMutationID = parseInt(
       //   (
       //     await db.oneOrNone(
-      //       'SELECT last_mutation_id FROM replicache_client WHERE id = $1',
+      //       'SELECT last_mutation_id FROM fruit_replicache_client WHERE id = $1',
       //       push.clientID,
       //     )
       //   )?.last_mutation_id ?? '0',
       // );
       // if (!lastMutationID) {
       //   await db.none(
-      //     'INSERT INTO replicache_client (id, last_mutation_id) VALUES ($1, $2)',
+      //     'INSERT INTO fruit_replicache_client (id, last_mutation_id) VALUES ($1, $2)',
       //     [push.clientID, lastMutationID],
       //   );
       // }
@@ -120,7 +120,7 @@ export default async (req, res) => {
       );
 
       await t.none(
-        'UPDATE replicache_client SET last_mutation_id = $2 WHERE id = $1',
+        'UPDATE fruit_replicache_client SET last_mutation_id = $2 WHERE id = $1',
         [push.clientID, lastMutationID],
       );
       res.send('{}');
@@ -169,7 +169,7 @@ async function clearPins() {
 
 async function getLastMutationID(t, clientID) {
   const clientRow = await t.oneOrNone(
-    'SELECT last_mutation_id FROM replicache_client WHERE id = $1', clientID,
+    'SELECT last_mutation_id FROM fruit_replicache_client WHERE id = $1', clientID,
   );
   if (clientRow) {
     console.log("[push] Found client:", parseInt(clientRow.last_mutation_id))
@@ -178,7 +178,7 @@ async function getLastMutationID(t, clientID) {
 
   console.log('[push] No client, Creating new client', clientID);
   await t.none(
-    'INSERT INTO replicache_client (id, last_mutation_id) VALUES ($1, 0)',
+    'INSERT INTO fruit_replicache_client (id, last_mutation_id) VALUES ($1, 0)',
     clientID,
   );
   return 0;

@@ -13,7 +13,7 @@ export default async (req, res) => {
       const lastMutationID = parseInt(
         (
           await db.oneOrNone(
-            'select last_mutation_id from replicache_client where id = $1',
+            'select last_mutation_id from fruit_replicache_client where id = $1',
             pull.clientID,
           )
         )?.last_mutation_id ?? '0',
