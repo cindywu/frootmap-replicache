@@ -34,14 +34,3 @@ export default function Navigation({ rep }: Props ) {
     </Navbar>
   )
 }
-
-const PinList = ({ pins } : any ) => {
-  return pins.map(([k, v]: [any, any]) => {
-    return (
-      <div key={k}>
-        <b>{v.from}: </b>
-        {v.content}
-      </div>
-    )
-  })
-}
