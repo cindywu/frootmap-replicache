@@ -1,16 +1,9 @@
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
-
 import Modal from 'react-modal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
-import { useDispatch } from 'react-redux'
 import { useSwipeable } from 'react-swipeable'
-
 import { ICoords } from '../models/types'
-import { createPin } from "../features/pinSlice"
-import { setMap } from "../features/mapSlice"
-
 import { useSubscribe } from 'replicache-react-util'
 import { Replicache, MutatorDefs } from 'replicache'
 
@@ -39,8 +32,6 @@ const PinFormModal = (props : Props) => {
   const [titleInput, setTitleInput] = useState<string>('')
   const [error, setError] = useState<string>('')
 
-  const dispatch = useDispatch()
-
   const handlers = useSwipeable({
     onSwiped: (eventData) => {
       handleClose()
@@ -67,8 +58,8 @@ const PinFormModal = (props : Props) => {
 
   function renderFruits() {
     return FRUITS.map((f, i) => {
-      return renderButton(f, i);
-    });
+      return renderButton(f, i)
+    })
   }
 
   function renderButton(f: string, i: number) {
@@ -112,8 +103,8 @@ const PinFormModal = (props : Props) => {
 
     const newpayload = {
       id: id,
-      sender: "Cindy",
-      description: "A fruit",
+      sender: 'Cindy',
+      description: 'fruit',
       ord: order,
       text: value,
       lat: lat,
@@ -143,7 +134,7 @@ const PinFormModal = (props : Props) => {
 
   function handleInputChange(event: any) {
     setTitleInput(event.target.value)
-    setFruit("")
+    setFruit('')
   }
 
   return (

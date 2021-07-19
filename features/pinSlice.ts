@@ -58,7 +58,7 @@ const pinSlice = createSlice({
     createPin(state: any, action: PayloadAction<CreatePinPayload>) {
       const { pinCoords, text } = action.payload
       const newState = state.concat([newPin(pinCoords, text)])
-      localStorage.setItem('localPins', JSON.stringify(newState));
+      localStorage.setItem('localPins', JSON.stringify(newState))
       return newState
     },
 

@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
-import Modal, { Styles } from "react-modal";
+import React from 'react'
+import Modal from 'react-modal'
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import { useSwipeable } from "react-swipeable";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
+import { useSwipeable } from 'react-swipeable'
 
-import { IPin, ICoords } from "../models/types"
+import { ICoords } from '../models/types'
 
-import { deletePin } from '../features/pinSlice'
-import { Replicache, MutatorDefs } from 'replicache';
+import { Replicache, MutatorDefs } from 'replicache'
 
-Modal.setAppElement("#root");
+Modal.setAppElement("#root")
 
-interface ModalProps {
-  // pin?: IPin,
+type Props = {
   pin?: any,
   togglePinModal: () => void,
   togglePinFormModal: (coords: any, toggle: any) => void,
@@ -22,7 +19,14 @@ interface ModalProps {
   rep: Replicache<MutatorDefs>,
 }
 
-const PinModal = ( props: ModalProps ) => {
+const PinModal = (props: Props) => {
+  const {
+    pin,
+    togglePinModal,
+    togglePinFormModal,
+    setSelectedViewCoords,
+    rep,
+  } = props
 
   const handlers = useSwipeable({
     onSwiped: (eventData) => {
@@ -30,21 +34,19 @@ const PinModal = ( props: ModalProps ) => {
     },
     trackMouse: true,
     preventDefaultTouchmoveEvent: true
-  });
-
-  const { pin } = props;
+  })
 
   let open = (pin && pin.id != undefined) || false
 
   function handleClose() {
-    props.togglePinFormModal({}, false);
-    props.togglePinModal();
-    props.setSelectedViewCoords({lat: 0, lng: 0})
+    togglePinFormModal({}, false);
+    togglePinModal();
+    setSelectedViewCoords({lat: 0, lng: 0})
   }
 
   function handleDelete() {
-    props.rep.mutate.deletePin({id: pin.id})
-    props.togglePinModal()
+    rep.mutate.deletePin({id: pin.id})
+    togglePinModal()
   }
 
   return <Modal
