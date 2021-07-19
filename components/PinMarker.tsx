@@ -1,8 +1,7 @@
-import React from "react";
-import { IPin } from "../models/types";
+import React from 'react'
+import { IPin } from '../models/types'
 
-interface PinMarkerProps {
-  // pin?: IPin,
+type Props = {
   style?: any,
   onClick: () => void,
   lat: number,
@@ -10,28 +9,35 @@ interface PinMarkerProps {
   pin: IPin
 }
 
-const PinMarker = ( props: PinMarkerProps ) => {
+const PinMarker = ( props: Props ) => {
+  const {
+    style,
+    onClick,
+    lat,
+    lng,
+    pin
+  } = props
 
   const clickHandler = () => {
-    props.onClick()
+    onClick()
   }
 
-  const time = new Date(props.pin.created_at)
+  const time = new Date(pin.created_at)
 
   return (
     <div
-      style={props.style}
+      style={style}
       className="pin-marker"
       onClick={clickHandler}
     >
       <div className="arrow"></div>
-      <h2>{props.pin.text}</h2>
-      <h4 className="muted">{props.pin.id}</h4>
+      <h2>{pin.text}</h2>
+      <h4 className="muted">{pin.id}</h4>
       <h4 className="muted">{time.toLocaleTimeString()} {time.toLocaleDateString()}</h4>
-      {/*<h4 className="muted">lat: {props.lat}</h4>
-      <h4 className="muted">lng: {props.lng}</h4>*/}
+      <h4 className="muted">lat: {Math.trunc(lat)}</h4>
+      <h4 className="muted">lng: {Math.trunc(lng)}</h4>
     </div>
-  );
-};
+  )
+}
 
 export default PinMarker
