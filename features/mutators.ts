@@ -1,5 +1,5 @@
-import { Replicache, ReadTransaction, WriteTransaction } from "replicache";
-import { ICoords, IPin, IPoint, JSONValue } from "../models/types";
+import { WriteTransaction } from 'replicache'
+import { ICoords, IPin, IPoint, JSONValue } from '../models/types'
 
 export const mutators = {
   async createPin(tx: WriteTransaction, args: {
@@ -27,5 +27,4 @@ export const mutators = {
     const del = await tx.del(`pin/${args['id']}`)
   },
 
-  // async ...
 }

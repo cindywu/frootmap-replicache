@@ -10,7 +10,6 @@ import { ICoords, IPin, IPoint, JSONValue } from "../models/types";
 import { useFormModal, usePinModal } from "../utils/useModal";
 
 import { loadPins, clearPins, selectPins } from '../features/pinSlice'
-import store from "./../utils/store";
 
 import { Replicache, MutatorDefs } from 'replicache';
 import * as Pusher from 'pusher-js';

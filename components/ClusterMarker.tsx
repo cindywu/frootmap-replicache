@@ -1,8 +1,6 @@
-import React from "react";
-import { IPin } from "../models/types";
+import { IPin } from '../models/types'
 
-const ClusterMarker = ( cluster : any ) => {
-
+const ClusterMarker = ( cluster : IPin ) => {
   const clickHandler = () => {
     cluster.onClick()
   }
@@ -18,7 +16,7 @@ const ClusterMarker = ( cluster : any ) => {
     >
       {cluster.text}
     </div>
-  );
-};
+  )
+}
 
 export default ClusterMarker

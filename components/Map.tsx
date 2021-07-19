@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import GoogleMapReact from "google-map-react";
-import { ICoords, IPin, IPoint } from "../models/types";
-import {PointFeature, ClusterProperties, AnyProps, ClusterFeature} from 'supercluster';
+import React from 'react'
+import GoogleMapReact from 'google-map-react'
+import { ICoords, IPin } from '../models/types'
+import { ClusterFeature } from 'supercluster'
 
-import PinMarker from "./../components/PinMarker";
-import ClusterMarker from "../components/ClusterMarker";
-import Vespa from "../components/Vespa";
+import PinMarker from './../components/PinMarker'
+import ClusterMarker from '../components/ClusterMarker'
+// import Vespa from '../components/Vespa'
 
-import { Replicache, MutatorDefs } from 'replicache';
-import { useSubscribe } from 'replicache-react-util';
+import { Replicache, MutatorDefs } from 'replicache'
+import { useSubscribe } from 'replicache-react-util'
 
-import useSupercluster from 'use-supercluster';
+import useSupercluster from 'use-supercluster'
 
 import { deserialize } from './../features/serializer'
 
@@ -44,18 +44,31 @@ interface MapProps {
   togglePinModal: (pin: IPin) => void,
   setSelectedViewCoords: (coords: ICoords) => void,
   selectedViewCoords: ICoords,
-  // clusters: (PointFeature<ClusterData> | PointFeature<ClusterProperties & AnyProps>)[],
-  // allPoints: IPoint[] | [],
-  // supercluster: any
   rep: Replicache<MutatorDefs>
   vespaCoords?: ICoords,
 }
 
 const Map = (props: MapProps) => {
-  const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
+  const {
+    map,
+    mapRef,
+    isShown,
+    zoom,
+    bounds,
+    setZoom,
+    setBounds,
+    togglePinFormModal,
+    togglePinModal,
+    setSelectedViewCoords,
+    selectedViewCoords,
+    rep,
+    vespaCoords,
+  } = props
+
+  const googleKey: string = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ''
 
   const pins = useSubscribe(
-    props.rep,
+    rep,
     async tx => {
       const data : any = await tx.scan({prefix: 'pin/'}).entries().toArray();
 
@@ -65,13 +78,12 @@ const Map = (props: MapProps) => {
       return pins
     },
     [],
-  );
-
+  )
 
   const { clusters, supercluster } : { clusters: any, supercluster: any } = useSupercluster({
     points: pins,
-    bounds: props.bounds,
-    zoom: props.zoom,
+    bounds: bounds,
+    zoom: zoom,
     options: {
       radius: 75,
       maxZoom: 20
@@ -92,40 +104,37 @@ const Map = (props: MapProps) => {
     event: React.MouseEvent<HTMLButtonElement>;
   }): any => {
     event.preventDefault();
-    // console.log('clicked map')
-    if (!props.isShown)
-      props.togglePinFormModal({lat: lat, lng: lng})
+    if (!isShown)
+      togglePinFormModal({lat: lat, lng: lng})
 
-      props.setSelectedViewCoords({lat: lat, lng: lng})
+      setSelectedViewCoords({lat: lat, lng: lng})
 
       // offset for repositioning map modal
       let vertOffset = 0.004 // this needs to be dynamically calculated based on zoom
 
-      if (props.zoom < 16) {
-        props.mapRef.current.setZoom(16)
+      if (zoom < 16) {
+        mapRef.current.setZoom(16)
       }
 
-      if (props.zoom > 16) {
+      if (zoom > 16) {
         vertOffset = 0.0002
       }
 
-      props.mapRef.current.panTo({lat: (lat - vertOffset), lng: (lng)})
-  };
+      mapRef.current.panTo({lat: (lat - vertOffset), lng: (lng)})
+  }
 
   function renderSelectedViewPin() {
-    // console.log("props.zoom", props.zoom)
-    // console.log("props.selectedViewCoords", props.selectedViewCoords)
-    if (props.selectedViewCoords == undefined) return
+    if (selectedViewCoords == undefined) return
 
-    let vertOffset = 0.0005; // needs to be recalced based on zoom
+    let vertOffset = 0.0005 // needs to be recalced based on zoom
 
-    if (props.zoom > 16) {
+    if (zoom > 16) {
       // vertOffset = -0.005;
     }
     return <div
       className="view-marker"
-      lat={(props.selectedViewCoords.lat + vertOffset)}
-      lng={props.selectedViewCoords.lng}
+      lat={(selectedViewCoords.lat + vertOffset)}
+      lng={selectedViewCoords.lng}
     >
       <div className="arrow"></div>
       New Pin!
@@ -133,21 +142,19 @@ const Map = (props: MapProps) => {
   }
 
   function renderMarkers() {
-    // if (props.clusters == []) return
     if (clusters == []) return
 
     // todo: fix any
     // return props.clusters.map( (cluster: ClusterFeature<any>, index) => {
     return clusters.map( (cluster: ClusterFeature<any>, index: number) => {
-      const [lng, lat] = cluster.geometry.coordinates;
+      const [lng, lat] = cluster.geometry.coordinates
       const {
         cluster: isCluster,
         point_count: pointCount,
         text: text,
-      } = cluster.properties;
+      } = cluster.properties
 
       if (isCluster) {
-
         return <ClusterMarker
           key={index}
           id={cluster.properties.id}
@@ -156,15 +163,17 @@ const Map = (props: MapProps) => {
           text={pointCount}
           width={`${10 + (pointCount / pins.length ) * 20}px`}
           length={`${10 + (pointCount / pins.length ) * 20}px`}
+          created_at={cluster.properties.created_at}
+          updated_at={cluster.properties.updated_at}
+          description={cluster.properties.description}
           onClick={() => {
             const expansionZoom = Math.min(supercluster.getClusterExpansionZoom(cluster.id), 20);
-            props.mapRef.current.setZoom(expansionZoom)
-            props.mapRef.current.panTo({lat: lat, lng: lng})
+            mapRef.current.setZoom(expansionZoom)
+            mapRef.current.panTo({lat: lat, lng: lng})
           }}
         />
 
       } else {
-
         // reserializing for the pin marker
         const pin : IPin = {
           id: cluster.properties.pinId,
@@ -172,10 +181,11 @@ const Map = (props: MapProps) => {
           created_at: cluster.properties.created_at,
           updated_at: cluster.properties.updated_at,
           description: cluster.properties.description,
-          coords: {
-            lat: cluster.properties[0],
-            lng: cluster.properties[1]
-          }
+          lat: cluster.properties.lat,
+          lng: cluster.properties.lng,
+          width: cluster.properties.width,
+          length: cluster.properties.length,
+          onClick: cluster.properties.onClick,
         }
 
         return <PinMarker
@@ -184,7 +194,7 @@ const Map = (props: MapProps) => {
           lng={lng}
           pin={pin}
           onClick={() => {
-            props.togglePinModal(pin)
+            togglePinModal(pin)
           }}
         />
 
@@ -196,15 +206,15 @@ const Map = (props: MapProps) => {
     <GoogleMapReact
       yesIWantToUseGoogleMapApiInternals
       bootstrapURLKeys={{ key: googleKey }}
-      center={props.map.center}
-      zoom={props.map.zoom}
+      center={map.center}
+      zoom={map.zoom}
       onClick={handleMapClick}
       onGoogleApiLoaded={({map}) => {
-        props.mapRef.current = map;
+        mapRef.current = map;
       }}
-      onChange={ ( { zoom , bounds } ) => {
-        props.setZoom(zoom)
-        props.setBounds([
+      onChange={({ zoom, bounds }) => {
+        setZoom(zoom)
+        setBounds([
           bounds.nw.lng,
           bounds.se.lat,
           bounds.se.lng,
@@ -212,14 +222,11 @@ const Map = (props: MapProps) => {
         ])
       }}
     >
-      {/*<Vespa vespaCoords={props.vespaCoords} />*/}
-      {/*{renderSelectedViewPin()}*/}
+      {/* <Vespa vespaCoords={vespaCoords} />
+      {renderSelectedViewPin()} */}
       {renderMarkers()}
     </GoogleMapReact>
   )
 }
-
-
-
 
 export default Map

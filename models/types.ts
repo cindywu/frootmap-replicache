@@ -2,7 +2,7 @@ import { GeoJsonTypes } from 'geojson';
 
 export interface ICoords {
   lat: number,
-  lng: number
+  lng: number,
 }
 
 // pin to be displayed on the map
@@ -13,7 +13,11 @@ export interface IPin {
   created_at: string,
   updated_at: string,
   description: string,
-  coords: ICoords
+  lat: number,
+  lng: number,
+  onClick: () => void,
+  width: string,
+  length: string,
 }
 
 // all data points

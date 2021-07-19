@@ -1,18 +1,17 @@
-import React from "react";
-import { ICoords } from "../models/types";
+import React from 'react'
+import { ICoords } from '../models/types'
 
-interface VespaProps {
+type Props = {
   vespaCoords?: ICoords
 }
 
-const Vespa = (props: VespaProps) => {
-
+const Vespa = ({ vespaCoords } : Props) => {
   return (
     <div>
-      {  props.vespaCoords &&
+      {  vespaCoords &&
         <div
-          lat={props.vespaCoords.lat}
-          lng={props.vespaCoords.lng}
+          lat={vespaCoords.lat}
+          lng={vespaCoords.lng}
         >
           <img src="/vespa.svg" />
         </div>
