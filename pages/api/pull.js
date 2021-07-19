@@ -1,4 +1,4 @@
-import {db} from '../../db.js';
+import { db } from '../../db'
 import { createClient } from '@supabase/supabase-js'
 
 export default async (req, res) => {
