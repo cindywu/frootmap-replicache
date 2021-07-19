@@ -16,7 +16,7 @@ import { Replicache, MutatorDefs } from 'replicache'
 
 Modal.setAppElement("#root")
 
-interface IPinModalProps {
+type Props = {
   isShown: boolean,
   modalPinCoords: ICoords,
   togglePinFormModal: () => void,
@@ -25,7 +25,16 @@ interface IPinModalProps {
   rep: Replicache<MutatorDefs>
 }
 
-const PinFormModal = (props: IPinModalProps) => {
+const PinFormModal = (props : Props) => {
+  const {
+    isShown,
+    modalPinCoords,
+    togglePinFormModal,
+    setSelectedViewCoords,
+    clearPins,
+    rep
+  } = props
+
   const [fruit, setFruit] = useState<string>('')
   const [titleInput, setTitleInput] = useState<string>('')
   const [error, setError] = useState<string>('')
@@ -53,7 +62,7 @@ const PinFormModal = (props: IPinModalProps) => {
   ]
 
   const handleClearPins = () : void => {
-    props.clearPins()
+    clearPins()
   }
 
   function renderFruits() {
@@ -64,41 +73,39 @@ const PinFormModal = (props: IPinModalProps) => {
 
   function renderButton(f: string, i: number) {
     const classes =
-      fruit === f ? "btn btn-dark m-2" : "btn btn-outline-dark m-2";
+      fruit === f ? "btn btn-dark m-2" : "btn btn-outline-dark m-2"
 
     return (
       <button className={classes} onClick={() => setFruit(f)} key={i}>
         {f}
       </button>
-    );
+    )
   }
 
   const pins = useSubscribe(
-    props.rep,
+    rep,
     async tx => {
-      const thepins : any = await tx.scan({prefix: 'pin/'}).entries().toArray();
-      return thepins;
+      const list = await tx.scan({prefix: 'pin/'}).entries().toArray()
+      return list
     },
     [],
   )
 
   function handleClose() {
-    setFruit("");
-    setError("");
-    setTitleInput("");
-    props.togglePinFormModal();
-    props.setSelectedViewCoords({lat: 0, lng: 0})
+    setFruit('')
+    setError('')
+    setTitleInput('')
+    togglePinFormModal()
+    setSelectedViewCoords({lat: 0, lng: 0})
   }
 
-  // todo: form payload
   function repCreatePin(payload: any) {
-
     const maxOrder = pins.length === 0 ? 0 : pins.map((p: any) => p[1].order).reduce((a: number, b: number) => a > b ? a : b)
     const order = maxOrder + 1
 
     let id = Math.random().toString(32).substr(2)
 
-    let {lat, lng} = props.modalPinCoords
+    let {lat, lng} = modalPinCoords
     let value = fruit || titleInput || null
 
     const time = new Date().toISOString()
@@ -112,24 +119,22 @@ const PinFormModal = (props: IPinModalProps) => {
       lat: lat,
       lng: lng,
       created_at: time,
-      updated_at: time
+      updated_at: time,
     }
 
     console.log("[pinformmodal] payload", newpayload)
 
-    props.rep.mutate.createPin({...newpayload})
+    rep.mutate.createPin({...newpayload})
   }
 
   function handleClick() {
     let value = fruit || titleInput || null
     if (value) {
       const payload = {
-        pinCoords: props.modalPinCoords,
+        pinCoords: modalPinCoords,
         text: value
       }
-
       repCreatePin(payload)
-
       handleClose()
     } else {
       setError("Please select a fruit!");
@@ -137,14 +142,14 @@ const PinFormModal = (props: IPinModalProps) => {
   }
 
   function handleInputChange(event: any) {
-    setTitleInput(event.target.value);
-    setFruit("");
+    setTitleInput(event.target.value)
+    setFruit("")
   }
 
   return (
     <div>
       <Modal
-        isOpen={props.isShown}
+        isOpen={isShown}
         className="modal modal.shown animate__animated animate__slideInUp animate__faster"
         contentLabel="Create a pin modal"
         onRequestClose={() => handleClose()}
@@ -213,8 +218,8 @@ const PinFormModal = (props: IPinModalProps) => {
 
         <p className="muted mt-5 position-absolute text-center w-100">
           Coordinates:
-          <span className="mr-3">Lat: {props.modalPinCoords.lat}</span>
-          <span>Lng: {props.modalPinCoords.lng}</span>
+          <span className="mr-3">Lat: {modalPinCoords.lat}</span>
+          <span>Lng: {modalPinCoords.lng}</span>
         </p>
 
       </Modal>
