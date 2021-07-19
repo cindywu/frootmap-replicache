@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import Modal from "react-modal";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import { useDispatch } from "react-redux";
-import { useSwipeable } from "react-swipeable";
+import Modal from 'react-modal'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons'
+import { useDispatch } from 'react-redux'
+import { useSwipeable } from 'react-swipeable'
 
-import { ICoords } from "../models/types";
-import { createPin } from "../features/pinSlice";
-import { setMap } from "../features/mapSlice";
+import { ICoords } from '../models/types'
+import { createPin } from "../features/pinSlice"
+import { setMap } from "../features/mapSlice"
 
-import { useSubscribe } from 'replicache-react-util';
-import { Replicache, MutatorDefs } from 'replicache';
+import { useSubscribe } from 'replicache-react-util'
+import { Replicache, MutatorDefs } from 'replicache'
 
-Modal.setAppElement("#root");
+Modal.setAppElement("#root")
 
 interface IPinModalProps {
   isShown: boolean,
@@ -26,9 +26,9 @@ interface IPinModalProps {
 }
 
 const PinFormModal = (props: IPinModalProps) => {
-  const [fruit, setFruit] = useState<string>("");
-  const [titleInput, setTitleInput] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [fruit, setFruit] = useState<string>('')
+  const [titleInput, setTitleInput] = useState<string>('')
+  const [error, setError] = useState<string>('')
 
   const dispatch = useDispatch()
 
@@ -38,33 +38,19 @@ const PinFormModal = (props: IPinModalProps) => {
     },
     trackMouse: true,
     preventDefaultTouchmoveEvent: true
-  });
+  })
 
   const FRUITS = [
-    "Mango",
-    "Pineapple",
-    "Lemon",
+    "🥭",
+    "🍍",
+    "🍋",
     "Lime",
-    "Orange",
-    "Coconut",
+    "🍊",
+    "🥥",
     "Pomegranate",
     "Pomelo",
-    "Eggplant",
-  ];
-
-  // const onKeyDown = (event: Event;) => {
-  //   console.log('event', event)
-  //   if (event.keyCode === 27 && isShown) {
-  //     hide();
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   document.addEventListener('keydown', onKeyDown, false);
-  //   return () => {
-  //     document.removeEventListener('keydown', onKeyDown, false);
-  //   };
-  // }, [isShown]);
+    "🍆",
+  ]
 
   const handleClearPins = () : void => {
     props.clearPins()
@@ -94,7 +80,7 @@ const PinFormModal = (props: IPinModalProps) => {
       return thepins;
     },
     [],
-  );
+  )
 
   function handleClose() {
     setFruit("");
@@ -107,10 +93,8 @@ const PinFormModal = (props: IPinModalProps) => {
   // todo: form payload
   function repCreatePin(payload: any) {
 
-    let order;
-
-    const last = pins.length && pins[pins.length - 1][1];
-    order = (last?.order ?? 0) + 1;
+    const maxOrder = pins.length === 0 ? 0 : pins.map((p: any) => p[1].order).reduce((a: number, b: number) => a > b ? a : b)
+    const order = maxOrder + 1
 
     let id = Math.random().toString(32).substr(2)
 
@@ -121,7 +105,7 @@ const PinFormModal = (props: IPinModalProps) => {
 
     const newpayload = {
       id: id,
-      sender: "Denny",
+      sender: "Cindy",
       description: "A fruit",
       ord: order,
       text: value,
@@ -133,37 +117,20 @@ const PinFormModal = (props: IPinModalProps) => {
 
     console.log("[pinformmodal] payload", newpayload)
 
-    props.rep.mutate.createPin({...newpayload});
+    props.rep.mutate.createPin({...newpayload})
   }
 
   function handleClick() {
     let value = fruit || titleInput || null
     if (value) {
-
       const payload = {
         pinCoords: props.modalPinCoords,
         text: value
       }
 
-      // 1. await upload photo first
-      // 2. then repCreatePin(payload)
-
-      // async function uploadPhoto()
-      //   if resp.ok { payload.photoUrl = ""; repCreatePin(payload)
-      //   } else {
-      //     throw new Error("upload failed")
-      //   }
-      // }
-
-      // uploadPhoto().catch( e => {})
-
-
-      // todo: move rep to redux state?
-      // dispatch(createPin(payload))
-
       repCreatePin(payload)
 
-      handleClose();
+      handleClose()
     } else {
       setError("Please select a fruit!");
     }
@@ -219,16 +186,6 @@ const PinFormModal = (props: IPinModalProps) => {
             </div>
 
             <div className="modal-footer">
-
-              {/*
-              <button
-                className="btn btn-danger ml-3"
-                onClick={()=>dispatch(setMap({lat: 47.608013, lng: -122.335167, map: mapRef}))}
-              >
-                Go to Seattle
-              </button>
-              */}
-
               <button
                 className="btn btn-danger ml-3"
                 onClick={handleClearPins}
@@ -262,14 +219,7 @@ const PinFormModal = (props: IPinModalProps) => {
 
       </Modal>
     </div>
-  );
-};
+  )
+}
 
 export default PinFormModal
-
-// const mapDispatch = { createPin }
-
-// export default connect(
-//   null,
-//   mapDispatch)
-// (PinFormModal)
